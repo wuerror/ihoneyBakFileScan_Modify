@@ -31,31 +31,30 @@ logging.basicConfig(level=logging.WARNING, format="%(message)s")
 
 
 def vlun(urltarget):
-    pass
-    # try:
-    #     if proxies:
-    #         r = requests.get(url=urltarget, headers=header.generate(), timeout=timeout, allow_redirects=False, stream=True, verify=False, proxies=proxies)
-    #     else:
-    #         r = requests.get(url=urltarget, headers=header.generate(), timeout=timeout, allow_redirects=False, stream=True, verify=False)
-    #     if (r.status_code == 200) & ('html' not in r.headers.get('Content-Type')) & (
-    #             'image' not in r.headers.get('Content-Type')) & ('xml' not in r.headers.get('Content-Type')) & (
-    #             'text' not in r.headers.get('Content-Type')) & ('json' not in r.headers.get('Content-Type')) & (
-    #             'javascript' not in r.headers.get('Content-Type')):
-    #         tmp_rarsize = int(r.headers.get('Content-Length'))
-    #         rarsize = str(size(tmp_rarsize))
-    #         if (int(rarsize[0:-1]) > 0):
-    #             logging.warning('[ success ] {}  size:{}'.format(urltarget, rarsize))
-    #             with open(outputfile, 'a') as f:
-    #                 try:
-    #                     f.write(str(urltarget) + '  ' + 'size:' + str(rarsize) + '\n')
-    #                 except:
-    #                     pass
-    #         else:
-    #             logging.warning('[ fail ] {}'.format(urltarget))
-    #     else:
-    #         logging.warning('[ fail ] {}'.format(urltarget))
-    # except Exception as e:
-    #     logging.warning('[ fail ] {}'.format(urltarget))
+    try:
+        if proxies:
+            r = requests.get(url=urltarget, headers=header.generate(), timeout=timeout, allow_redirects=False, stream=True, verify=False, proxies=proxies)
+        else:
+            r = requests.get(url=urltarget, headers=header.generate(), timeout=timeout, allow_redirects=False, stream=True, verify=False)
+        if (r.status_code == 200) & ('html' not in r.headers.get('Content-Type')) & (
+                'image' not in r.headers.get('Content-Type')) & ('xml' not in r.headers.get('Content-Type')) & (
+                'text' not in r.headers.get('Content-Type')) & ('json' not in r.headers.get('Content-Type')) & (
+                'javascript' not in r.headers.get('Content-Type')):
+            tmp_rarsize = int(r.headers.get('Content-Length'))
+            rarsize = str(size(tmp_rarsize))
+            if (int(rarsize[0:-1]) > 0):
+                logging.warning('[ success ] {}  size:{}'.format(urltarget, rarsize))
+                with open(outputfile, 'a') as f:
+                    try:
+                        f.write(str(urltarget) + '  ' + 'size:' + str(rarsize) + '\n')
+                    except:
+                        pass
+            else:
+                logging.warning('[ fail ] {}'.format(urltarget))
+        else:
+            logging.warning('[ fail ] {}'.format(urltarget))
+    except Exception as e:
+        logging.warning('[ fail ] {}'.format(urltarget))
 
 
 def normalize_url_path(url):
@@ -332,17 +331,12 @@ def generate_enhanced_dictionary(original_url, final_url, dic):
             path_keywords = parsed_path.replace('/', '_').replace('-', '_')
             all_components.add(path_keywords)
             
-            # 如果路径包含常见的应用标识，添加相关字典
-            common_apps = ['admin', 'portal', 'dashboard', 'console', 'manager', 'system', 
-                          'login', 'auth', 'api', 'app', 'web', 'site', 'mesh', 'control',
-                          'panel', 'backend', 'mgmt', 'manage']
-            for app in common_apps:
-                if app in parsed_path.lower():
-                    all_components.add(app)
-                    all_components.add(f"{app}_backup")
-                    all_components.add(f"{app}_bak")
-                    all_components.add(f"backup_{app}")
-                    all_components.add(f"bak_{app}")
+            app = parsed_path.lower()
+            all_components.add(app)
+            all_components.add(f"{app}_backup")
+            all_components.add(f"{app}_bak")
+            all_components.add(f"backup_{app}")
+            all_components.add(f"bak_{app}")
     
     # 清理并去重
     all_components = [comp for comp in all_components if comp and len(comp) > 0]
@@ -443,17 +437,13 @@ def dispatcher(url_file=None, url=None, max_thread=20, dic=None, check_redirect=
                     path_keywords = parsed_path.replace('/', '_').replace('-', '_')
                     global_enhanced_components.add(path_keywords)
                     
-                    # 如果路径包含常见的应用标识，添加相关字典
-                    common_apps = ['admin', 'portal', 'dashboard', 'console', 'manager', 'system', 
-                                  'login', 'auth', 'api', 'app', 'web', 'site', 'mesh', 'control',
-                                  'panel', 'backend', 'mgmt', 'manage', 'user', 'client', 'service']
-                    for app in common_apps:
-                        if app in parsed_path.lower():
-                            global_enhanced_components.add(app)
-                            global_enhanced_components.add(f"{app}_backup")
-                            global_enhanced_components.add(f"{app}_bak")
-                            global_enhanced_components.add(f"backup_{app}")
-                            global_enhanced_components.add(f"bak_{app}")
+
+                    app = parsed_path.lower()
+                    global_enhanced_components.add(app)
+                    global_enhanced_components.add(f"{app}_backup")
+                    global_enhanced_components.add(f"{app}_bak")
+                    global_enhanced_components.add(f"backup_{app}")
+                    global_enhanced_components.add(f"bak_{app}")
     
     # 生成全局增强字典
     global_enhanced_dict = []
@@ -596,13 +586,14 @@ if __name__ == '__main__':
     tmp_suffixFormat = ['.zip', '.rar', '.tar.gz', '.tgz', '.tar.bz2', '.tar', '.jar', '.war', '.7z', '.bak', '.sql',
                         '.gz', '.sql.gz', '.tar.tgz']
     # 77
+    #joomla wordpress wp去掉了，根据目标的语言类型扫描前再做调整吧
     tmp_info_dic = ['1', '127.0.0.1', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019',
                     '2020', '2021', '2022', '2023', '2024', '2025', 'admin', 'archive', 'asp', 'aspx', 'auth', 'back',
                     'backup', 'backups', 'bak', 'bbs', 'bin', 'clients', 'code', 'com', 'customers', 'dat', 'data',
                     'database', 'db', 'dump', 'engine', 'error_log', 'faisunzip', 'files', 'forum', 'home', 'html',
-                    'index', 'joomla', 'js', 'jsp', 'local', 'localhost', 'master', 'media', 'members', 'my', 'mysql',
+                    'index', 'js', 'jsp', 'local', 'localhost', 'master', 'media', 'members', 'my', 'mysql',
                     'new', 'old', 'orders', 'php', 'sales', 'site', 'sql', 'store', 'tar', 'test', 'user', 'users',
-                    'vb', 'web', 'website', 'wordpress', 'wp', 'www', 'wwwroot', 'root', 'log']
+                    'vb', 'web', 'website', 'www', 'wwwroot', 'root', 'log']
     
     if args.prefix_name:
         if ',' in args.prefix_name:
@@ -654,4 +645,4 @@ if __name__ == '__main__':
         else:
             print("[!] Please specify a URL or URL file name")
     except Exception as e:
-        print(e.args)
+        print(e)
