@@ -80,6 +80,7 @@ https://www.baidu.comn/www.baidu.com.zip  size:10M
     -t --thread         指定线程数，建议100
     -u --url            单个url扫描时指定url
     -d --dict-file      自定义扫描字典
+    -n --name           自定义的备份文件前缀
     -o --output-file    结果写入的文件名
     -p --proxy          代理服务，例：socks5://127.0.0.1:1080
 使用:
@@ -88,6 +89,11 @@ https://www.baidu.comn/www.baidu.com.zip  size:10M
                   python3 ihoneyBakFileScan_Modify.py -u www.baidu.com -o result.txt
                   python3 ihoneyBakFileScan_Modify.py -u www.baidu.com -d dict.txt -o result.txt
 ```
+# 2025.5.28 添加、修改内容
+
+增加-n参数，传递想自定义的文件名，原有的-d参数必须为完整的字典(name.suffix)。
+增加对url跳转，从路径提取关键词作为字典的处理。
+
 # 2023.4.19 添加、修改内容
 
 添加代理功能
