@@ -546,12 +546,17 @@ def dispatcher(url_file=None, url=None, max_thread=20, dic=None, check_redirect=
         
         # 生成检查URL列表
         check_urllist = []
-        base_url = final_url if (check_redirect and redirect_success) else original_url
+        # 实战存在跳转/service1,但是备份是/service1.rar，所以得都扫，不能只扫跳转后路径
+        base_url = original_url
         
         for info_item in current_info_dic:
             check_url = str(base_url) + str(info_item)
             check_urllist.append(check_url)
             print("[add check] " + check_url)
+            if (check_redirect and redirect_success):
+                check_url = str(final_url) + str(info_item)
+                check_urllist.append(check_url)
+                print("[add check] " + check_url)
 
         print(f"[info] Total URLs to check for this site: {len(check_urllist)}")
 
@@ -573,10 +578,10 @@ if __name__ == '__main__':
 
     parser = ArgumentParser(add_help=True, usage=usageexample, description='A Website Backup File Leak Scan Tool with Redirect Support.')
     parser.add_argument('-f', '--url-file', dest="url_file", help="Example: url.txt")
-    parser.add_argument('-t', '--thread', dest="max_threads", nargs='?', type=int, default=1, help="Max threads")
+    parser.add_argument('-t', '--thread', dest="max_threads", nargs='?', type=int, default=5, help="Max threads")
     parser.add_argument('-u', '--url', dest='url', nargs='?', type=str, help="Example: http://www.example.com/")
     parser.add_argument('-d', '--dict-file', dest='dict_file', nargs='?', help="Example: dict.txt")
-    parser.add_argument('-n', '--name', dest='prefix_name', nargs='?', help="人工猜想的文件名比如Portal,用,分割多个")
+    parser.add_argument('-n', '--name', dest='prefix_name', nargs='?', help="人工猜想的文件名比如服务名+版本号webeip2,用,分割多个")
     parser.add_argument('-o', '--output-file', dest="output_file", help="Example: result.txt")
     parser.add_argument('-p', '--proxy', dest="proxy", help="Example: socks5://127.0.0.1:1080")
     parser.add_argument('--no-redirect', dest="no_redirect", action='store_true', help="禁用跳转检测")
@@ -587,14 +592,23 @@ if __name__ == '__main__':
                         '.gz', '.sql.gz', '.tar.tgz']
     # 77
     #joomla wordpress wp去掉了，根据目标的语言类型扫描前再做调整吧
+    # tmp_info_dic = ['1', '127.0.0.1', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019',
+    #                 '2020', '2021', '2022', '2023', '2024', '2025', 'admin', 'archive', 'asp', 'aspx', 'auth', 'back',
+    #                 'backup', 'backups', 'bak',"beifen", 'bbs', 'bin', 'clients', 'code', 'com', 'customers', 'dat', 'data',
+    #                 'database', 'db', 'dump', 'engine', 'error_log', 'faisunzip', 'files', 'forum', 'home', 'html',
+    #                 'index', 'js', 'jsp', 'local', 'localhost', 'master', 'media', 'members', 'my', 'mysql',
+    #                 'new', 'old', 'orders', 'php', 'sales', 'site', 'sql', 'store', 'tar', 'test', 'user', 'users',
+    #                 'vb', 'web', 'website', 'www', 'wwwroot', 'root', 'log']
+    
+
     tmp_info_dic = ['1', '127.0.0.1', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019',
                     '2020', '2021', '2022', '2023', '2024', '2025', 'admin', 'archive', 'asp', 'aspx', 'auth', 'back',
-                    'backup', 'backups', 'bak', 'bbs', 'bin', 'clients', 'code', 'com', 'customers', 'dat', 'data',
-                    'database', 'db', 'dump', 'engine', 'error_log', 'faisunzip', 'files', 'forum', 'home', 'html',
-                    'index', 'js', 'jsp', 'local', 'localhost', 'master', 'media', 'members', 'my', 'mysql',
-                    'new', 'old', 'orders', 'php', 'sales', 'site', 'sql', 'store', 'tar', 'test', 'user', 'users',
+                    'backup', 'backups', 'bak',"beifen", 'bin', 'clients', 'code', 'com', 'customers', 'dat', 'data',
+                    'database', 'db', 'dump', 'engine', 'error_log', 'faisunzip', 'files', 'home', 'html',
+                    'index', 'local', 'localhost', 'master', 'media', 'members', 'my', 'mysql',
+                    'new', 'old', 'site', 'sql', 'tar', 'test', 'user', 'users',
                     'vb', 'web', 'website', 'www', 'wwwroot', 'root', 'log']
-    
+
     if args.prefix_name:
         if ',' in args.prefix_name:
             human_prefix = args.prefix_name.split(',')
@@ -626,7 +640,7 @@ if __name__ == '__main__':
         headers=False  # don`t generate misc headers
     )
 
-    timeout = 10
+    timeout = 3
 
     try:
         if args.dict_file and outputfile:
